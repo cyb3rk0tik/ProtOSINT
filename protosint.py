@@ -126,7 +126,6 @@ def checkGeneratedProtonAccounts():
     PROGRAM 2 : Try to find if your target have a protonmail account by generating multiple adresses by combining information fields inputted
     
     """
-
     #Input
     print("Let's go, try to find your protonmail target:")
     firstName = input("First name: ").lower()
@@ -136,61 +135,44 @@ def checkGeneratedProtonAccounts():
     pseudo2 = input("Pseudo 2: ").lower()
     zipCode = input("zipCode: ")
 
-    #Protonmail domain
-    domainList = ["@protonmail.com","@protonmail.ch","@pm.me"]
-
     #List of combinaison
-    pseudoList=[]
+    pseudoList = []
     
     for domain in domainList:
-        #For domain
-        pseudoList.append(firstName+lastName+domain)
-        pseudoList.append(lastName+firstName+domain)
-        pseudoList.append(firstName[0]+lastName+domain)
-        pseudoList.append(pseudo1+domain)
-        pseudoList.append(pseudo2+domain)
-        pseudoList.append(lastName+domain)
-        pseudoList.append(firstName+lastName+yearOfBirth+domain)
-        pseudoList.append(firstName[0]+lastName+yearOfBirth+domain)
-        pseudoList.append(lastName+firstName+yearOfBirth+domain)
-        pseudoList.append(pseudo1+yearOfBirth+domain)
-        pseudoList.append(pseudo2+yearOfBirth+domain)
-        pseudoList.append(firstName+lastName+yearOfBirth[-2:]+domain)
-        pseudoList.append(firstName+lastName+yearOfBirth[-2:]+domain)
-        pseudoList.append(firstName[0]+lastName+yearOfBirth[-2:]+domain)
-        pseudoList.append(lastName+firstName+yearOfBirth[-2:]+domain)
-        pseudoList.append(pseudo1+yearOfBirth[-2:]+domain)
-        pseudoList.append(pseudo2+yearOfBirth[-2:]+domain)
-        pseudoList.append(firstName+lastName+zipCode+domain)
-        pseudoList.append(firstName[0]+lastName+zipCode+domain)
-        pseudoList.append(lastName+firstName+zipCode+domain)
-        pseudoList.append(pseudo1+zipCode+domain)
-        pseudoList.append(pseudo2+zipCode+domain)
-        pseudoList.append(firstName+lastName+zipCode[:2]+domain)
-        pseudoList.append(firstName[0]+lastName+zipCode[:2]+domain)
-        pseudoList.append(lastName+firstName+zipCode[:2]+domain)
-        pseudoList.append(pseudo1+zipCode[:2]+domain)
-        pseudoList.append(pseudo2+zipCode[:2]+domain)
-
+        if lastName: 
+            pseudoList.append(lastName)
+            if firstName: 
+                pseudoList.extend([lastName+firstName, firstName[0]+lastName, firstName+lastName])
+                if zipCode:
+                    pseudoList.extend([firstName+lastName+zipCode, firstName+lastName+zipCode[:2]])		
+                    pseudoList.extend([firstName[0]+lastName+zipCode, firstName[0]+lastName+zipCode[:2]])			
+                    pseudoList.extend([lastName+firstName+zipCode, lastName+firstName+zipCode[:2]])
+                if yearOfBirth:
+                    pseudoList.extend([firstName+lastName+yearOfBirth, firstName+lastName+yearOfBirth[-2:]])
+                    pseudoList.extend([firstName[0]+lastName+yearOfBirth, firstName[0]+lastName+yearOfBirth[-2:]])
+                    pseudoList.extend([lastName+firstName+yearOfBirth, lastName+firstName+yearOfBirth[-2:]])
+        if pseudo1: 
+            pseudoList.append(pseudo1)
+            if zipCode: pseudoList.extend([pseudo1+zipCode, pseudo1+zipCode[:2]])
+            if yearOfBirth: pseudoList.extend([pseudo1+yearOfBirth, pseudo1+yearOfBirth[-2:]])
+        if pseudo2: 
+            pseudoList.append(pseudo2)
+            if zipCode: pseudoList.extend([pseudo2+yearOfBirth, pseudo2+yearOfBirth[-2:]])
+            if yearOfBirth: pseudoList.extend([pseudo2+zipCode, pseudo2+zipCode[:2]])
 
     #Assign pseudoList as set for remove duplicates then convert to list
     pseudoListUniq = list(set(pseudoList)) 
-
-    #Remove all irrelevant combinations
-    for domain in domainList:
-        if domain in pseudoListUniq: pseudoListUniq.remove(domain)
-        if zipCode+domain in pseudoListUniq: pseudoListUniq.remove(zipCode+domain)
-        if zipCode[:2]+domain in pseudoListUniq: pseudoListUniq.remove(zipCode[:2]+domain)
-        if yearOfBirth+domain in pseudoListUniq: pseudoListUniq.remove(yearOfBirth+domain)
-        if yearOfBirth[-2:]+domain in pseudoListUniq: pseudoListUniq.remove(yearOfBirth[-2:]+domain)
-        if firstName+domain in pseudoListUniq: pseudoListUniq.remove(firstName+domain)
-
+    
+    #Protonmail domain
+    domainList = ["@protonmail.com","@protonmail.ch","@pm.me"]
+    
     print("===============================")
     print("I'm trying some combinaison: " + str(len(pseudoListUniq)))
     print("===============================")
-
-    for pseudo in pseudoListUniq:
-        checkEmail(pseudo)
+    
+    for domain in domainList:
+        for pseudo in pseudoListUniq:
+            checkEmail(pseudo + domain)
 
 def checkIPProtonVPN():
     """
@@ -210,8 +192,6 @@ def checkIPProtonVPN():
         print("This IP is currently affiliate to ProtonVPN")
     else:
         print("This IP is currently not affiliate to ProtonVPN")
-    #print(bodyResponse)
-
 
 # Entry point of the script
 def main():
